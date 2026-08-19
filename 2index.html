@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Ventas - Repostería</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #cbd5e1;
+    }
+
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
+    body { background-color: var(--bg); color: var(--text); padding: 1rem; }
+    .container { max-width: 700px; margin: 0 auto; }
+    
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      margin-bottom: 1.5rem;
+    }
+
+    h1 { font-size: 1.5rem; margin-bottom: 1rem; text-align: center; color: var(--primary); }
+    h2 { font-size: 1.15rem; margin-bottom: 1rem; }
+
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem; }
+    input, select {
+      width: 100%;
+      padding: 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: var(--primary); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    .tax-preview {
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      text-align: center;
+      gap: 0.5rem;
+    }
+    .tax-preview span { font-weight: bold; display: block; }
+
+    .btn {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn-secondary { background: #059669; margin-top: 0.5rem; }
+    .btn-secondary:hover { background: #047857; }
+
+    .table-container { overflow-x: auto; max-height: 250px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+    th, td { padding: 0.5rem; border-bottom: 1px solid var(--border); }
+    th { background: #f8fafc; position: sticky; top: 0; }
+
+    optgroup { font-weight: bold; font-style: normal; color: var(--primary); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Control de Ventas & Facturación</h1>
+
+  <!-- Formulario de Registro -->
+  <div class="card">
+    <h2>➕ Nueva Venta</h2>
+    <form id="saleForm">
+      
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="saleDate">Fecha</label>
+          <input type="date" id="saleDate" required>
+        </div>
+        <div class="form-group">
+          <label for="customer">Cliente</label>
+          <input type="text" id="customer" list="customersList" value="Público en General" required placeholder="Nombre del cliente...">
+          <datalist id="customersList">
+            <option value="Público en General"></option>
+          </datalist>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="product">Producto</label>
+          <select id="product" required>
+            <option value="" disabled selected>Selecciona un producto</option>
+            
+            <!-- Galletas y Panadería Básica -->
+            <optgroup label="Galletas y Panadería Básica">
+              <option value="Galletas de Almendra (5 pz)" data-sat="50181905" data-iva="0" data-ieps="8" data-price="35">Galletas de Almendra (5 pz) - $35</option>
+              <option value="Pan de Elote (Rebanada)" data-sat="50181900" data-iva="0" data-ieps="0" data-price="20">Pan de Elote (Rebanada) - $20</option>
+              <option value="Pan de Elote (Completo)" data-sat="50181900" data-iva="0" data-ieps="0" data-price="120">Pan de Elote (Completo) - $120</option>
+              <option value="Pan de Zanahoria (Rebanada)" data-sat="50181901" data-iva="0" data-ieps="8" data-price="30">Pan de Zanahoria (Rebanada) - $30</option>
+              <option value="Pan de Zanahoria (Completo)" data-sat="50181901" data-iva="0" data-ieps="8" data-price="170">Pan de Zanahoria (Completo) - $170</option>
+            </optgroup>
+            
+            <!-- Postres y Flanes -->
+            <optgroup label="Postres y Flanes">
+              <option value="Flan de Cajeta (Rebanada)" data-sat="50192303" data-iva="0" data-ieps="8" data-price="35">Flan de Cajeta (Rebanada) - $35</option>
+              <option value="Flan de Cajeta (Completo)" data-sat="50192303" data-iva="0" data-ieps="8" data-price="250">Flan de Cajeta (Completo) - $250</option>
+              <option value="Pay de Queso Fresa (Rebanada)" data-sat="50181901" data-iva="0" data-ieps="8" data-price="35">Pay de Queso Fresa (Rebanada) - $35</option>
+              <option value="Pay de Queso Fresa (Completo)" data-sat="50181901" data-iva="0" data-ieps="8" data-price="250">Pay de Queso Fresa (Completo) - $250</option>
+            </optgroup>
+            
+            <!-- Alimentos Preparados / Desayunos -->
+            <optgroup label="Alimentos Preparados / Desayunos">
+              <option value="Hot Cakes Tradicionales (3 pz)" data-sat="50192701" data-iva="0" data-ieps="0" data-price="50">Hot Cakes Tradicionales (3 pz) - $50</option>
+              <option value="Hot Cakes con Plátano (3 pz)" data-sat="50192701" data-iva="0" data-ieps="0" data-price="60">Hot Cakes con Plátano (3 pz) - $60</option>
+              <option value="Empanadas de Queso (3 pz)" data-sat="50192701" data-iva="0" data-ieps="0" data-price="50">Empanadas de Queso (3 pz) - $50</option>
+              <option value="Empanadas Pollo / Carne (3 pz)" data-sat="50192701" data-iva="0" data-ieps="0" data-price="50">Empanadas Pollo / Carne (3 pz) - $50</option>
+              <option value="Plátano Frito con Lechera" data-sat="50192701" data-iva="0" data-ieps="8" data-price="50">Plátano Frito con Lechera - $50</option>
+              <option value="Plátano Frito Queso y Crema" data-sat="50192701" data-iva="0" data-ieps="0" data-price="60">Plátano Frito Queso y Crema - $60</option>
+            </optgroup>
+
+            <optgroup label="Otros">
+              <option value="Pedido Especial / Otro" data-sat="50192301" data-iva="16" data-ieps="8" data-price="0">Pedido Especial (Ingresar Precio Manual)</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="quantity">Cantidad</label>
+          <input type="number" id="quantity" min="1" value="1" required>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="totalAmount">Total Cobrado ($ MXN)</label>
+          <input type="number" id="totalAmount" step="0.01" min="0" required placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label for="paymentMethod">Método de Cobro</label>
+          <select id="paymentMethod" required>
+            <option value="Transferencia Nu">Transferencia (Nu)</option>
+            <option value="Efectivo">Efectivo (Caja)</option>
+            <option value="Tarjeta">Tarjeta / Terminal</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Desglose Fiscal Automático -->
+      <div class="tax-preview">
+        <div>Subtotal (Base): <span id="lblSubtotal">$0.00</span></div>
+        <div>IVA: <span id="lblIVA">$0.00</span></div>
+        <div>IEPS: <span id="lblIEPS">$0.00</span></div>
+      </div>
+
+      <div class="form-group">
+        <label for="invoiceType">Destino Fiscal</label>
+        <select id="invoiceType" required>
+          <option value="Factura Global Mes">Factura Global del Mes</option>
+          <option value="Factura Individual">Factura Individual</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn">Guardar Venta</button>
+    </form>
+  </div>
+
+  <!-- Resumen y Exportación -->
+  <div class="card">
+    <h2>📋 Ventas Registradas</h2>
+    <div class="table-container">
+      <table id="salesTable">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Producto</th>
+            <th>Total</th>
+            <th>Método</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <button id="btnExport" class="btn btn-secondary">📥 Exportar a CSV (Excel / Sheets)</button>
+  </div>
+</div>
+
+<script>
+  // Inicialización de fecha
+  document.getElementById('saleDate').value = new Date().toISOString().split('T')[0];
+
+  let salesData = JSON.parse(localStorage.getItem('ventas_postreria')) || [];
+
+  const productSelect = document.getElementById('product');
+  const quantityInput = document.getElementById('quantity');
+  const totalInput = document.getElementById('totalAmount');
+  const saleForm = document.getElementById('saleForm');
+
+  // Actualizar cálculo al seleccionar producto o cantidad
+  productSelect.addEventListener('change', autoFillPrice);
+  quantityInput.addEventListener('input', autoFillPrice);
+  totalInput.addEventListener('input', calculateTaxes);
+
+  function autoFillPrice() {
+    const selectedOption = productSelect.options[productSelect.selectedIndex];
+    const defaultPrice = parseFloat(selectedOption.dataset.price) || 0;
+    const qty = parseInt(quantityInput.value) || 1;
+    
+    if (defaultPrice > 0) {
+      totalInput.value = (defaultPrice * qty).toFixed(2);
+    } else {
+      totalInput.value = ''; // Limpia el total si es un pedido especial
+    }
+    calculateTaxes();
+  }
+
+  function getTaxRates() {
+    const selectedOption = productSelect.options[productSelect.selectedIndex];
+    const ivaRate = (parseFloat(selectedOption?.dataset.iva) || 0) / 100;
+    const iepsRate = (parseFloat(selectedOption?.dataset.ieps) || 0) / 100;
+    return { ivaRate, iepsRate };
+  }
+
+  function calculateTaxes() {
+    const total = parseFloat(totalInput.value) || 0;
+    const { ivaRate, iepsRate } = getTaxRates();
+
+    // Fórmula desglosadora: Base = Total / (1 + %IVA + %IEPS)
+    const subtotal = total / (1 + ivaRate + iepsRate);
+    const iva = subtotal * ivaRate;
+    const ieps = subtotal * iepsRate;
+
+    document.getElementById('lblSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+    document.getElementById('lblIVA').textContent = `$${iva.toFixed(2)}`;
+    document.getElementById('lblIEPS').textContent = `$${ieps.toFixed(2)}`;
+
+    return { subtotal, iva, ieps };
+  }
+
+  // Guardar Venta
+  saleForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const { subtotal, iva, ieps } = calculateTaxes();
+    const selectedOption = productSelect.options[productSelect.selectedIndex];
+
+    const sale = {
+      id: 'VTA-' + (salesData.length + 1).toString().padStart(3, '0'),
+      date: document.getElementById('saleDate').value,
+      customer: document.getElementById('customer').value,
+      product: selectedOption.value, // <--- Ajustado para tomar el nombre limpio directamente del value
+      satCode: selectedOption.dataset.sat,
+      quantity: parseInt(quantityInput.value),
+      total: parseFloat(totalInput.value),
+      subtotal: parseFloat(subtotal.toFixed(2)),
+      iva: parseFloat(iva.toFixed(2)),
+      ieps: parseFloat(ieps.toFixed(2)),
+      paymentMethod: document.getElementById('paymentMethod').value,
+      invoiceType: document.getElementById('invoiceType').value
+    };
+
+    salesData.push(sale);
+    localStorage.setItem('ventas_postreria', JSON.stringify(salesData));
+    
+    // Resetear formulario y mantener "Público en General" y la fecha de hoy
+    saleForm.reset();
+    document.getElementById('saleDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('customer').value = "Público en General"; 
+    
+    calculateTaxes();
+    renderTable();
+  });
+
+  // Renderizar tabla
+  function renderTable() {
+    const tbody = document.querySelector('#salesTable tbody');
+    tbody.innerHTML = '';
+    salesData.slice().reverse().forEach(item => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${item.date}</td>
+        <td>${item.customer}</td>
+        <td>${item.product} (${item.quantity})</td>
+        <td>$${item.total.toFixed(2)}</td>
+        <td>${item.paymentMethod}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Exportar a CSV
+  document.getElementById('btnExport').addEventListener('click', () => {
+    if (salesData.length === 0) return alert('No hay ventas registradas.');
+    
+    let csv = 'Folio,Fecha,Cliente,Producto,Clave SAT,Cantidad,Total,Subtotal (Base),IVA,IEPS,Metodo Pago,Tipo Factura\n';
+    salesData.forEach(row => {
+      csv += `${row.id},${row.date},"${row.customer}","${row.product}",${row.satCode},${row.quantity},${row.total},${row.subtotal},${row.iva},${row.ieps},"${row.paymentMethod}","${row.invoiceType}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', `ventas_${new Date().toISOString().slice(0,7)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+
+  renderTable();
+</script>
+</body>
+</html>
